@@ -1,3 +1,4 @@
+import { inspect } from "util";
 import {
   Box,
   Button,
@@ -10,49 +11,39 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import axios from "axios";
+import { GetServerSidePropsContext } from "next";
 import { useCallback, useRef } from "react";
-const HomePage = () => {
-  const formRef = useRef<HTMLFormElement>(null);
+import { baseAxiosIntance } from "../lib/axios";
 
-  const login = useCallback(() => {
-    const form = formRef.current;
-    if (!form) return;
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  console.log(inspect(context.req, false, null));
 
-    const email = form.email.value;
-    const password = form.password.value;
-
-    console.log({ email, password });
-
-    // return axios.post('');
-  }, []);
-
-  return (
-    <Center w={"full"} minH="100vh">
-      <Stack
-        onSubmit={(e) => {
-          e.preventDefault();
-          login();
-        }}
-        spacing={4}
-        as="form"
-        minW={400}
-        noValidate
-        ref={formRef as any}
-      >
-        <Heading textAlign={"center"}>Login</Heading>
-        <FormControl>
-          <FormLabel>Email</FormLabel>
-          <Input name="email" type={"email"} />
-        </FormControl>
-        <FormControl>
-          <FormLabel>Password</FormLabel>
-          <Input name="password" type={"password"} />
-        </FormControl>
-
-        <Button type="submit">Submit</Button>
-      </Stack>
-    </Center>
-  );
+  try {
+    const { data } = await baseAxiosIntance.get("user");
+    return {
+      props: {
+        data,
+      },
+    };
+  } catch (error: any) {
+    if (error?.response?.status === 401) {
+      return {
+        redirect: {
+          destination: "/login",
+          permanent: false,
+        },
+      };
+    }
+    if (error?.response?.status === 404) {
+      return {
+        notFound: true,
+      };
+    }
+    throw error;
+  }
+}
+const HomePage = (props: any) => {
+  return <Heading>Homepage</Heading>;
 };
 
 export default HomePage;

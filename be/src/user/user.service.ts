@@ -19,4 +19,11 @@ export class UsersService {
       password,
     }).save();
   }
+
+  getUserProfile(userId: string) {
+    return this.userModel.findById(userId);
+  }
+  getAllUsers() {
+    return this.userModel.find();
+  }
 }
