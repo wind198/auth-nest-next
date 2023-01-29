@@ -9,6 +9,7 @@ import {
   Heading,
   Input,
   Stack,
+  Text,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { GetServerSidePropsContext } from "next";
@@ -16,16 +17,21 @@ import { useCallback, useRef } from "react";
 import { baseAxiosIntance } from "../lib/axios";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  console.log(inspect(context.req, false, null));
-
+  const { accessToken } = context.req.cookies;
   try {
-    const { data } = await baseAxiosIntance.get("user");
+    const { data } = await baseAxiosIntance.get("user", {
+      headers: {
+        Cookie: `accessToken=${accessToken}`,
+      },
+    });
     return {
       props: {
         data,
       },
     };
   } catch (error: any) {
+    console.log(error);
+
     if (error?.response?.status === 401) {
       return {
         redirect: {
@@ -43,7 +49,14 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   }
 }
 const HomePage = (props: any) => {
-  return <Heading>Homepage</Heading>;
+  return (
+    <Box>
+      <Heading>Homepage</Heading>
+      {props.data.map((user: any, index: number) => (
+        <Text key={index}>{user.email}</Text>
+      ))}
+    </Box>
+  );
 };
 
 export default HomePage;

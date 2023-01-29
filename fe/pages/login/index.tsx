@@ -43,7 +43,7 @@ const LoginPage = () => {
 
     setAccessToken(accessToken);
 
-    push("/login");
+    push("/");
   }, [authApi, setAccessToken, push]);
 
   return (

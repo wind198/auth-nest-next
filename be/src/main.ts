@@ -1,5 +1,6 @@
 import { ConfigService } from '@nestjs/config/dist';
 import { NestFactory } from '@nestjs/core';
+import * as cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -12,6 +13,8 @@ async function bootstrap() {
       credentials: true,
     },
   });
+
+  app.use(cookieParser());
 
   /**
    * Get port number
